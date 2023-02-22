@@ -1,6 +1,6 @@
 .PHONY: all build push run dev
 
-DOCKER_TAG ?= dsys/match:latest
+DOCKER_TAG ?= mmandrille/imatch:latest
 
 export PORT ?= 80
 export ELASTICSEARCH_URL ?= elasticsearch:9200
