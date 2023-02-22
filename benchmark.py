@@ -15,7 +15,8 @@ parser.add_argument('-c', dest='concurrency', default=10, type=int, help='concur
 args = parser.parse_args()
 
 images = glob.glob(args.images_dir + '/*')
-print('benchmarking with {} images, {} iterations, {} concurrency'.format(len(images), args.iterations, args.concurrency))
+print(f'benchmarking with {len(images)} images, {args.iterations} iterations, {args.concurrency} concurrency')
+
 
 def run(i):
     start = time.time()
@@ -26,12 +27,14 @@ def run(i):
     end = time.time()
     print('elapsed: {}'.format(end - start))
 
+
 if __name__ == '__main__':
     total_start = time.time()
     executor = ThreadPoolExecutor(max_workers=args.concurrency)
 
     try:
-        for x in executor.map(run, range(args.iterations)): pass
+        for x in executor.map(run, range(args.iterations)):
+            pass
     except KeyboardInterrupt:
         print('shutting down...')
         executor.shutdown()
