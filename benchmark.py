@@ -9,7 +9,7 @@ import uuid
 
 parser = argparse.ArgumentParser(description='Benchmark Match.')
 parser.add_argument('images_dir', metavar='IMAGES_DIR', type=str, help='directory with images to test')
-parser.add_argument('-u', dest='url', default='http://localhost:8888', type=str, help='the URL of Match')
+parser.add_argument('-u', dest='url', default='http://localhost:80', type=str, help='the URL of Match')
 parser.add_argument('-i', dest='iterations', default=1000, type=int, help='number of iterations during the benchmark')
 parser.add_argument('-c', dest='concurrency', default=10, type=int, help='concurrency of requests during the benchmark')
 args = parser.parse_args()

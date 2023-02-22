@@ -27,11 +27,11 @@ RUN python -c "import matplotlib as mpl"
 # Enviroment Variables, you can overwrite them
 ENV PORT=80
 ENV WORKER_COUNT=4
-ENV ELASTICSEARCH_URL=elasticsearch:9200
+ENV ELASTICSEARCH_URL=localhost:9200
 ENV ELASTICSEARCH_INDEX=images
 ENV ELASTICSEARCH_DOC_TYPE=images
 ENV ALL_ORIENTATIONS=true
 
 # Run the Imatch server
-COPY server.py wait-for-it.sh /
+COPY server.py wait-for-it.sh
 CMD gunicorn -t 60 -b 0.0.0.0:${PORT} -w ${WORKER_COUNT} server:app

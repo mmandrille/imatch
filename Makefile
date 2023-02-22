@@ -2,7 +2,7 @@
 
 DOCKER_TAG ?= dsys/match:latest
 
-export PORT ?= 8888
+export PORT ?= 80
 export ELASTICSEARCH_URL ?= elasticsearch:9200
 export ELASTICSEARCH_INDEX ?= images
 export ELASTICSEARCH_DOC_TYPE ?= images

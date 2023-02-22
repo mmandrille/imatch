@@ -29,7 +29,14 @@ services:
 
   match:
     build: .
-    image: imatch
+    container_name: mmandrille/imatch:latest
+    environment:
+      ENV PORT: 80
+      ENV WORKER_COUNT: 4
+      ENV ELASTICSEARCH_URL: "elasticsearch:9200"
+      ENV ELASTICSEARCH_INDEX: "images"
+      ENV ELASTICSEARCH_DOC_TYPE: "images"
+      ENV ALL_ORIENTATIONS: "true"
     ports:
     - 8099:80
     command: ["/wait-for-it.sh", "-t", "60", "elasticsearch:9200", "--", "gunicorn", "-b", "0.0.0.0:80", "-w", "4", "server:app"]
@@ -42,5 +49,3 @@ services:
       interval: 60s
       timeout: 30s
       retries: 3
-
-
