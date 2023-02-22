@@ -33,5 +33,6 @@ ENV ELASTICSEARCH_DOC_TYPE=images
 ENV ALL_ORIENTATIONS=true
 
 # Run the Imatch server
-COPY server.py wait-for-it.sh
+COPY server.py /
+COPY wait-for-it.sh /
 CMD gunicorn -t 60 -b 0.0.0.0:${PORT} -w ${WORKER_COUNT} server:app
