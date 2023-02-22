@@ -10,7 +10,7 @@ uses: docker/login-action@v1
 with:
 registry: ghcr.io
 username: ${{ github.actor }}
-password: ${{ secrets.GITHUB_TOKEN }}
+password: ${{ github.token }}
 - name: Build the match-docker Docker image
 run: |
        docker build . --tag ghcr.io/mmandrille/match:latest
