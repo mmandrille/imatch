@@ -21,6 +21,8 @@ ENV PORT=80 \
     ELASTICSEARCH_DOC_TYPE=images \
     ALL_ORIENTATIONS=true
 
+RUN python -c "import matplotlib as mpl"
+
 CMD gunicorn \
     -t 60 \
     --access-logfile - \
