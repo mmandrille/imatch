@@ -27,7 +27,7 @@ services:
       timeout: 30s
       retries: 3
 
-  match:
+  imatch:
     build: .
     container_name: mmandrille/imatch:latest
     environment:
