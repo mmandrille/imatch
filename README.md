@@ -307,20 +307,32 @@ Check for the health of the server.
   "result": []
 }
 ```
+## Testing
+
+1. Create the environment
+```
+  sudo apt-get update
+  sudo apt-get install -y libopenblas-dev gfortran
+  sudo apt-get install python3.7
+	mkvirtualenv -a . --python=python3.7 imatch # Venv should already be active
+  ./requierements.sh
+  ./run_test.sh
+```
+
 
 ## Development
-
+```
     $ export ELASTICSEARCH_URL=https://daisy.us-west-1.es.amazonaws.com
     $ make build
     $ make run
     $ make push
-
+```
 
 ## Push To your Docker.io
 To create a repository, sign into Docker Hub, select Repositories then Create Repository: https://hub.docker.com/repositories
 ```
   docker login
-  docker build -t <user>/imatch:latest [path_to_this_repo]/imatch/.
+  docker build -t mmandrille/imatch:latest .
   docker push mmandrille/imatch:latest
 ```
 

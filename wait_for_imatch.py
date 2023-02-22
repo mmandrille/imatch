@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 # Globals
 TIMEOUT = int(os.getenv('TIMEOUT', 60))
-ELASTICSEARCH_URL = os.environ['ELASTICSEARCH_URL']
+IMATCH_URL = os.environ['IMATCH_URL']
 
 
 # Run
@@ -21,13 +21,13 @@ if __name__ == "__main__":
     response = None
     while not response or response.status_code != 200:
         try:
-            logger.info(f"Testing ElasticSearch Server at: {ELASTICSEARCH_URL}")
+            logger.info(f"Testing Imatch Server at: {IMATCH_URL}")
             response = requests.get(
-                f"{ELASTICSEARCH_URL}/_cluster/health",
+                f"{IMATCH_URL}/ping",
                 timeout=TIMEOUT,
             )
-            logger.info(f"Elastic Status: {response.json()}")
+            logger.info(f"Imatch: {response.json()}")
         except Exception as e:
-            logger.info(f"Elastic is not available in {ELASTICSEARCH_URL}, keep waiting...")
+            logger.info(f"Imatch is not available in {IMATCH_URL}, keep waiting...")
             logger.debug(e)
             time.sleep(5)

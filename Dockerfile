@@ -22,19 +22,19 @@ RUN pip install image-match==1.1.2
 RUN pip install "elasticsearch>=6.0.0,<7.0.0"
 RUN rm -rf /var/lib/apt/lists/*
 
-# Generate Matlib Cache
-RUN python -c "import matplotlib as mpl"
-
 # Enviroment Variables, you can overwrite them
 ENV PORT=80
 ENV WORKER_COUNT=4
 ENV TIMEOUT=60
 ENV MAX_RETRIES=5
-ENV ELASTICSEARCH_URL=localhost:9200
+ENV ELASTICSEARCH_URL=http://localhost:9200
 ENV ELASTICSEARCH_INDEX=images
 ENV ELASTICSEARCH_DOC_TYPE=images
 ENV ALL_ORIENTATIONS=true
 ENV DEBUG_LEVEL=20
+
+# Generate Matlib Cache
+RUN python -c "import matplotlib as mpl"
 
 # Copy files
 COPY entrypoint.sh /

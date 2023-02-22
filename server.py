@@ -103,7 +103,7 @@ def get_image(url_field, file_field):
 def add_handler():
     path = request.form['filepath']
     try:
-        metadata = jsonify(request.form['metadata'])
+        metadata = json.dumps(request.form['metadata'])
     except KeyError:
         metadata = None
     img, bs = get_image('url', 'image')

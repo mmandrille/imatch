@@ -36,7 +36,7 @@ services:
       WORKER_COUNT: 4
       PORT: 80
       TIMEOUT: 60
-      ELASTICSEARCH_URL: "elasticsearch:9200"
+      ELASTICSEARCH_URL: "http://elasticsearch:9200"
       ELASTICSEARCH_INDEX: "imatch"
       ELASTICSEARCH_DOC_TYPE: "images"
       ALL_ORIENTATIONS: "true"
