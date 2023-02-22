@@ -317,9 +317,10 @@ Check for the health of the server.
 
 
 ## Push To your Docker.io
+To create a repository, sign into Docker Hub, select Repositories then Create Repository: https://hub.docker.com/repositories
 ```
-  docker login --username=mmandrille --email=mmandrille@gmail.com docker.io
-  docker build -t mmandrille/imatch:latest -f Dockerfile .
+  docker login
+  docker build -t <user>/imatch:latest [path_to_this_repo]/imatch/.
   docker push mmandrille/imatch:latest
 ```
 

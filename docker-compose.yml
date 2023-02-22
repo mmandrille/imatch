@@ -31,15 +31,17 @@ services:
     build: .
     container_name: imatch
     environment:
-      PORT: 80
+      PYTHONUNBUFFERED: 1
+      DEBUG_LEVEL: 10 # DEBUG
       WORKER_COUNT: 4
+      PORT: 80
+      TIMEOUT: 60
       ELASTICSEARCH_URL: "elasticsearch:9200"
       ELASTICSEARCH_INDEX: "images"
       ELASTICSEARCH_DOC_TYPE: "images"
       ALL_ORIENTATIONS: "true"
     ports:
     - 8099:80
-    command: ["/wait-for-it.sh", "-t", "60", "elasticsearch:9200", "--", "gunicorn", "-b", "0.0.0.0:80", "-w", "4", "server:app"]
     depends_on:
     - elasticsearch
     links:

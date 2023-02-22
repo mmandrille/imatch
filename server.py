@@ -20,16 +20,26 @@ logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s|%(levelname)s: %(messag
 logger = logging.getLogger(__name__)
 
 # Globals
-es_url = os.environ['ELASTICSEARCH_URL']
-es_index = os.environ['ELASTICSEARCH_INDEX']
-es_doc_type = os.environ['ELASTICSEARCH_DOC_TYPE']
-all_orientations = os.environ['ALL_ORIENTATIONS']
+TIMEOUT = int(os.getenv('TIMEOUT', 60))
+MAX_RETRIES = int(os.getenv('MAX_RETRIES', 5))
+ELASTICSEARCH_URL = os.environ['ELASTICSEARCH_URL']
+ELASTICSEARCH_INDEX = os.environ['ELASTICSEARCH_INDEX']
+ELASTICSEARCH_DOC_TYPE = os.environ['ELASTICSEARCH_DOC_TYPE']
+ALL_ORIENTATIONS = os.environ['ALL_ORIENTATIONS']
 
+
+# Launch
 app = Flask(__name__)
-es = Elasticsearch([es_url], verify_certs=True, timeout=60, max_retries=10, retry_on_timeout=True)
-ses = SignatureES(es, index=es_index, doc_type=es_doc_type)
+es = Elasticsearch(
+    [ELASTICSEARCH_URL],
+    verify_certs=True,
+    timeout=TIMEOUT,
+    max_retries=MAX_RETRIES,
+    retry_on_timeout=True
+)
+ses = SignatureES(es, index=ELASTICSEARCH_INDEX, doc_type=ELASTICSEARCH_DOC_TYPE)
 gis = ImageSignature()
-es.indices.create(index=es_index, ignore=400)
+es.indices.create(index=ELASTICSEARCH_INDEX, ignore=400)
 
 
 # =============================================================================
@@ -53,14 +63,14 @@ def logging_after(response):
 # =============================================================================
 # Helpers
 def ids_with_path(path):
-    matches = es.search(index=es_index,
+    matches = es.search(index=ELASTICSEARCH_INDEX,
                         _source='_id',
                         q='path:' + json.dumps(path))
     return [m['_id'] for m in matches['hits']['hits']]
 
 
 def paths_at_location(offset, limit):
-    search = es.search(index=es_index,
+    search = es.search(index=ELASTICSEARCH_INDEX,
                        from_=offset,
                        size=limit,
                        _source='path')
@@ -68,12 +78,12 @@ def paths_at_location(offset, limit):
 
 
 def count_images():
-    return es.count(index=es_index)['count']
+    return es.count(index=ELASTICSEARCH_INDEX)['count']
 
 
 def delete_ids(ids):
     for i in ids:
-        es.delete(index=es_index, doc_type=es_doc_type, id=i, ignore=404)
+        es.delete(index=ELASTICSEARCH_INDEX, doc_type=ELASTICSEARCH_DOC_TYPE, id=i, ignore=404)
 
 
 def dist_to_percent(dist):
@@ -126,11 +136,11 @@ def delete_handler():
 @app.route('/search', methods=['POST'])
 def search_handler():
     img, bs = get_image('url', 'image')
-    ao = request.form.get('all_orientations', all_orientations) == 'true'
+    ao = request.form.get('ALL_ORIENTATIONS', ALL_ORIENTATIONS) == 'true'
 
     matches = ses.search_image(
             path=img,
-            all_orientations=ao,
+            ALL_ORIENTATIONS=ao,
             bytestream=bs)
 
     return json.dumps({
