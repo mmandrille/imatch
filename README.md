@@ -315,8 +315,15 @@ Check for the health of the server.
     $ make run
     $ make push
 
-## License and Acknowledgements
 
+## Push To your Docker.io
+```
+  docker login --username=mmandrille --email=mmandrille@gmail.com docker.io
+  docker build -t mmandrille/imatch:latest -f Dockerfile .
+  docker push mmandrille/imatch:latest
+```
+
+## License and Acknowledgements
 Match is based on [ascribe/image-match](https://github.com/ascribe/image-match), which is in turn based on the paper [_An image signature for any kind of image_, Goldberg et al](http://www.cs.cmu.edu/~hcwong/Pdfs/icip02.ps). There is an existing [reference implementation](https://www.pureftpd.org/project/libpuzzle) which may be more suited to your needs.
 
 Match itself is released under the [BSD 3-Clause license](https://github.com/dsys/match/blob/master/LICENSE). `ascribe/image-match` is released under the Apache 2.0 license.
