@@ -1,14 +1,25 @@
-from elasticsearch import Elasticsearch
-from flask import Flask, request
-from image_match.elasticsearch_driver import SignatureES
-from image_match.goldberg import ImageSignature
-import json
+# Standard Imports
 import os
 import sys
+import time
+import json
+import logging
+# Flask imports
+from flask import g as app_ctx
+from flask import Flask, request, jsonify
+# Extra imports
+from elasticsearch import Elasticsearch
+from image_match.goldberg import ImageSignature
+from image_match.elasticsearch_driver import SignatureES
+
 
 # =============================================================================
-# Globals
+# Logger
+LOG_LEVEL = int(os.getenv('DEBUG_LEVEL', logging.INFO))
+logging.basicConfig(level=LOG_LEVEL, format='%(asctime)s|%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
+# Globals
 es_url = os.environ['ELASTICSEARCH_URL']
 es_index = os.environ['ELASTICSEARCH_INDEX']
 es_doc_type = os.environ['ELASTICSEARCH_DOC_TYPE']
@@ -18,19 +29,35 @@ app = Flask(__name__)
 es = Elasticsearch([es_url], verify_certs=True, timeout=60, max_retries=10, retry_on_timeout=True)
 ses = SignatureES(es, index=es_index, doc_type=es_doc_type)
 gis = ImageSignature()
-
-# Try to create the index and ignore IndexAlreadyExistsException
-# if the index already exists
 es.indices.create(index=es_index, ignore=400)
+
+
+# =============================================================================
+# Decorators
+@app.before_request
+def logging_before():
+    # Store the start time for the request
+    app_ctx.start_time = time.perf_counter()
+
+
+@app.after_request
+def logging_after(response):
+    # Get total time in milliseconds
+    total_time = time.perf_counter() - app_ctx.start_time
+    time_in_ms = int(total_time * 1000)
+    # Log the time taken for the endpoint
+    logger.info('%s ms %s %s %s', time_in_ms, request.method, request.path, dict(request.args))
+    return response
+
 
 # =============================================================================
 # Helpers
-
 def ids_with_path(path):
     matches = es.search(index=es_index,
                         _source='_id',
                         q='path:' + json.dumps(path))
     return [m['_id'] for m in matches['hits']['hits']]
+
 
 def paths_at_location(offset, limit):
     search = es.search(index=es_index,
@@ -39,15 +66,19 @@ def paths_at_location(offset, limit):
                        _source='path')
     return [h['_source']['path'] for h in search['hits']['hits']]
 
+
 def count_images():
     return es.count(index=es_index)['count']
+
 
 def delete_ids(ids):
     for i in ids:
         es.delete(index=es_index, doc_type=es_doc_type, id=i, ignore=404)
 
+
 def dist_to_percent(dist):
     return (1 - dist) * 100
+
 
 def get_image(url_field, file_field):
     if url_field in request.form:
@@ -55,14 +86,14 @@ def get_image(url_field, file_field):
     else:
         return request.files[file_field].read(), True
 
+
 # =============================================================================
 # Routes
-
 @app.route('/add', methods=['POST'])
 def add_handler():
     path = request.form['filepath']
     try:
-        metadata = json.loads(request.form['metadata'])
+        metadata = jsonify(request.form['metadata'])
     except KeyError:
         metadata = None
     img, bs = get_image('url', 'image')
@@ -78,6 +109,7 @@ def add_handler():
         'result': []
     })
 
+
 @app.route('/delete', methods=['DELETE'])
 def delete_handler():
     path = request.form['filepath']
@@ -89,6 +121,7 @@ def delete_handler():
         'method': 'delete',
         'result': []
     })
+
 
 @app.route('/search', methods=['POST'])
 def search_handler():
@@ -111,6 +144,7 @@ def search_handler():
         } for m in matches]
     })
 
+
 @app.route('/compare', methods=['POST'])
 def compare_handler():
     img1, bs1 = get_image('url1', 'image1')
@@ -123,8 +157,9 @@ def compare_handler():
         'status': 'ok',
         'error': [],
         'method': 'compare',
-        'result': [{ 'score': score }]
+        'result': [{'score': score}]
     })
+
 
 @app.route('/count', methods=['GET', 'POST'])
 def count_handler():
@@ -135,6 +170,7 @@ def count_handler():
         'method': 'count',
         'result': [count]
     })
+
 
 @app.route('/list', methods=['GET', 'POST'])
 def list_handler():
@@ -153,6 +189,7 @@ def list_handler():
         'result': paths
     })
 
+
 @app.route('/ping', methods=['GET', 'POST'])
 def ping_handler():
     return json.dumps({
@@ -162,9 +199,9 @@ def ping_handler():
         'result': []
     })
 
+
 # =============================================================================
 # Error Handling
-
 @app.errorhandler(400)
 def bad_request(e):
     return json.dumps({
@@ -173,6 +210,7 @@ def bad_request(e):
         'method': '',
         'result': []
     }), 400
+
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -183,6 +221,7 @@ def page_not_found(e):
         'result': []
     }), 404
 
+
 @app.errorhandler(405)
 def method_not_allowed(e):
     return json.dumps({
@@ -191,6 +230,7 @@ def method_not_allowed(e):
         'method': '',
         'result': []
     }), 405
+
 
 @app.errorhandler(500)
 def server_error(e):
