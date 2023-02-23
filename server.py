@@ -6,7 +6,7 @@ import json
 import logging
 # Flask imports
 from flask import g as app_ctx
-from flask import Flask, request, jsonify
+from flask import Flask, request
 # Extra imports
 from elasticsearch import Elasticsearch
 from image_match.goldberg import ImageSignature
