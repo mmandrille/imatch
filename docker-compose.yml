@@ -32,14 +32,14 @@ services:
     container_name: imatch
     environment:
       PYTHONUNBUFFERED: 1
-      DEBUG_LEVEL: 10 # DEBUG
-      WORKER_COUNT: 4
+      DEBUG_LEVEL: 10 # INFO
+      WORKER_COUNT: 1
       PORT: 80
       TIMEOUT: 60
       ELASTICSEARCH_URL: "http://elasticsearch:9200"
       ELASTICSEARCH_INDEX: "imatch"
       ELASTICSEARCH_DOC_TYPE: "images"
-      ALL_ORIENTATIONS: "true"
+      ALL_ORIENTATIONS: "false"
     ports:
     - 8099:80
     depends_on:
