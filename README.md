@@ -316,7 +316,7 @@ Check for the health of the server.
   sudo apt-get install python3.7
 	mkvirtualenv -a . --python=python3.7 imatch # Venv should already be active
   ./requierements.sh
-  ./run_test.sh
+  ./run_test.sh -vv
 ```
 
 
