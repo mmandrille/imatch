@@ -9,14 +9,13 @@ networks:
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.1
     container_name: elasticsearch
-    logging:
-      driver: none
     volumes:
       - ./elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      logger.level: WARN
     ports:
       - 127.0.0.1:9200:9200
     networks:
@@ -32,7 +31,7 @@ services:
     container_name: imatch
     environment:
       PYTHONUNBUFFERED: 1
-      DEBUG_LEVEL: 10 # INFO
+      DEBUG_LEVEL: 20 # INFO
       WORKER_COUNT: 1
       PORT: 80
       TIMEOUT: 60
