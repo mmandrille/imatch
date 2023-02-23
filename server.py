@@ -104,16 +104,13 @@ def get_image(url_field, file_field):
 @app.route('/add', methods=['POST'])
 def add_handler():
     path = request.form['filepath']
-    try:
-        metadata = json.dumps(request.form['metadata'])
-    except KeyError:
-        metadata = None
+    metadata = None
+    if 'metadata' in request.form:
+        metadata = json.loads(request.form['metadata'])
     img, bs = get_image('url', 'image')
-
     old_ids = ids_with_path(path)
     ses.add_image(path, img, bytestream=bs, metadata=metadata)
     delete_ids(old_ids)
-
     return json.dumps({
         'status': 'ok',
         'error': [],
@@ -138,7 +135,7 @@ def delete_handler():
 @app.route('/search', methods=['POST'])
 def search_handler():
     img, bs = get_image('url', 'image')
-    ao = request.form.get('ALL_ORIENTATIONS', ALL_ORIENTATIONS) == 'true'
+    ao = request.form.get('all_orientations', ALL_ORIENTATIONS) == 'true'
 
     matches = ses.search_image(
             path=img,
@@ -149,11 +146,13 @@ def search_handler():
         'status': 'ok',
         'error': [],
         'method': 'search',
-        'result': [{
-            'score': dist_to_percent(m['dist']),
-            'filepath': m['path'],
-            'metadata': m['metadata']
-        } for m in matches]
+        'result': [
+            {
+                'score': dist_to_percent(m['dist']),
+                'filepath': m['path'],
+                'metadata': m['metadata']
+            } for m in matches
+        ]
     })
 
 
@@ -175,11 +174,12 @@ def compare_handler():
 
 @app.route('/count', methods=['GET', 'POST'])
 def count_handler():
+    count = count_images()
     return json.dumps({
         'status': 'ok',
         'error': [],
         'method': 'count',
-        'result': count_images()
+        'result': count
     })
 
 
