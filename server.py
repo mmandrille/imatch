@@ -56,7 +56,9 @@ def logging_after(response):
     total_time = time.perf_counter() - app_ctx.start_time
     time_in_ms = int(total_time * 1000)
     # Log the time taken for the endpoint
-    logger.info('%s ms %s %s %s', time_in_ms, request.method, request.path, dict(request.args))
+    logger.info('%s ms %s %s', time_in_ms, request.method, request.path)
+    logger.debug('Request: %s', request.data)
+    logger.debug('Response: %s', json.loads(response.get_data()))
     return response
 
 
@@ -140,7 +142,7 @@ def search_handler():
 
     matches = ses.search_image(
             path=img,
-            ALL_ORIENTATIONS=ao,
+            all_orientations=ao,
             bytestream=bs)
 
     return json.dumps({
@@ -173,12 +175,11 @@ def compare_handler():
 
 @app.route('/count', methods=['GET', 'POST'])
 def count_handler():
-    count = count_images()
     return json.dumps({
         'status': 'ok',
         'error': [],
         'method': 'count',
-        'result': [count]
+        'result': count_images()
     })
 
 
