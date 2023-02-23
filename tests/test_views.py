@@ -63,11 +63,13 @@ def search_photo(url):
 
 
 def delete_photo(url):
-    return requests.delete(
+    response = requests.delete(
         f'{IMATCH_URL}/delete',
         data={'filepath': get_filepath(url)},
         timeout=TIMEOUT
     )
+    time.sleep(1)
+    return response
 
 
 def get_list():
@@ -97,7 +99,11 @@ def test_add_handler():
 
 def test_delete_handler():
     clean_elastic()
-    pass
+    add_photo(get_metadata(URL1))
+    response_delete = delete_photo(URL1)
+    assert response_delete.status_code == 200
+    response_count = requests.get(f'{IMATCH_URL}/count')
+    assert response_count.json()['result'] == 0
 
 
 def test_search_handler():
